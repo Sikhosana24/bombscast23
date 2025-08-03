@@ -3,14 +3,14 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "components/ui/button"
+import { Card, CardTitle, CardDescription } from "components/ui/card"
 import { ArrowLeft, Play, Pause, Heart, CheckCircle } from "lucide-react"
-import { useFavourites, type FavouritedEpisode } from "@/context/favourites-context"
-import { usePlayer } from "@/context/player-context"
+import { useFavourites, type FavouritedEpisode } from "context/favourites-context"
+import { usePlayer } from "context/player-context"
 import { format } from "date-fns"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Progress } from "@/components/ui/progress" // Assuming you have shadcn Progress component
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "components/ui/select"
+import { Progress } from "components/ui/progress" // Assuming you have shadcn Progress component
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "components/ui/alert-dialog"
+import { fetchShowById, type Show } from "lib/api"
 
 type SortOption = "title-asc" | "title-desc" | "date-newest" | "date-oldest"
 
@@ -165,7 +166,16 @@ export default function FavouritesPage() {
                             <Heart className="fill-red-500 text-red-500" />
                           </Button>
                           <Button
-                            onClick={() => playEpisode(fav.episode, fav.show, progressData?.progress || 0)}
+                            onClick={async () => {
+                              try {
+                                const fullShow = await fetchShowById(fav.show.id);
+                                playEpisode(fav.episode, fullShow, progressData?.progress || 0);
+                              } catch (error) {
+                                console.error("Failed to fetch show data:", error);
+                                // Fallback to partial show data if fetch fails
+                                playEpisode(fav.episode, fav.show as unknown as Show, progressData?.progress || 0);
+                              }
+                            }}
                             variant={currentEpisode?.id === fav.episode.id && isPlaying ? "secondary" : "default"}
                           >
                             {currentEpisode?.id === fav.episode.id && isPlaying ? (
