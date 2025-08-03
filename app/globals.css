@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode: Orange and White */
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 220 20% 8%; /* Very dark grey/near black for text */
+
+    --card: 0 0% 100%; /* White card background */
+    --card-foreground: 220 20% 8%; /* Dark text on card */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 8%;
+
+    --primary: 24.6 95% 53.1%; /* Vibrant Orange (from logo) */
+    --primary-foreground: 0 0% 100%; /* White text on orange */
+
+    --secondary: 24.6 95% 95%; /* Very light orange/off-white for secondary buttons */
+    --secondary-foreground: 24.6 95% 20%; /* Dark orange text for secondary */
+
+    --muted: 24.6 95% 90%; /* Light orange for muted backgrounds like genre tags */
+    --muted-foreground: 24.6 95% 30%; /* Slightly darker orange for muted text */
+
+    --accent: 24.6 95% 95%; /* Light orange accent */
+    --accent-foreground: 220 20% 8%; /* Dark text on accent */
+
+    --destructive: 0 84.2% 60.2%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 100%; /* White text on red */
+
+    --border: 24.6 95% 90%; /* Light orange border */
+    --input: 24.6 95% 95%; /* Light orange input background */
+    --ring: 24.6 95% 53.1%; /* Primary orange for focus ring */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark Mode: Orange and Black */
+    --background: 220 20% 8%; /* Near Black background */
+    --foreground: 0 0% 100%; /* Pure White text */
+
+    --card: 220 20% 12%; /* Slightly lighter black for card background */
+    --card-foreground: 0 0% 100%; /* White text on card */
+
+    --popover: 220 20% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 24.6 95% 53.1%; /* Vibrant Orange (from logo) */
+    --primary-foreground: 0 0% 100%; /* White text on orange */
+
+    --secondary: 24.6 95% 30%; /* Darker orange for secondary buttons */
+    --secondary-foreground: 0 0% 100%; /* White text on secondary */
+
+    --muted: 220 20% 15%; /* Darker grey/black for muted backgrounds */
+    --muted-foreground: 215 20.2% 65.1%; /* Lighter grey for muted text */
+
+    --accent: 220 20% 15%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 15%; /* Darker border */
+    --input: 220 20% 15%; /* Darker input background */
+    --ring: 24.6 95% 53.1%; /* Primary orange for focus ring */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
