@@ -21,6 +21,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOrder, setSortOrder] = useState<SortOption>("updated-newest")
   const [selectedGenre, setSelectedGenre] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     const getShows = async () => {
@@ -71,6 +72,14 @@ export default function HomePage() {
 
     return filtered
   }, [allShows, searchTerm, sortOrder, selectedGenre])
+
+  // Pagination logic
+  const totalItems = filteredAndSortedShows.length
+  const itemsPerPage = Math.ceil(totalItems / 5) || 1 // Ensure at least 5 pages or 1 item per page minimum
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = filteredAndSortedShows.slice(startIndex, endIndex)
 
   if (loading) {
     return (
@@ -128,10 +137,16 @@ export default function HomePage() {
             type="text"
             placeholder="Search shows..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1) // Reset to first page on search change
+            }}
             className="flex-1"
           />
-          <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as SortOption)}>
+          <Select value={sortOrder} onValueChange={(value) => {
+            setSortOrder(value as SortOption)
+            setCurrentPage(1) // Reset to first page on sort change
+          }}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
@@ -142,7 +157,10 @@ export default function HomePage() {
               <SelectItem value="title-desc">Title (Z-A)</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={selectedGenre} onValueChange={setSelectedGenre}>
+          <Select value={selectedGenre} onValueChange={(value) => {
+            setSelectedGenre(value)
+            setCurrentPage(1) // Reset to first page on genre change
+          }}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by Genre" />
             </SelectTrigger>
@@ -160,34 +178,68 @@ export default function HomePage() {
         {filteredAndSortedShows.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">No shows found matching your criteria.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredAndSortedShows.map((show) => (
-              <Link key={show.id} href={`/show/${show.id}`}>
-                <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
-                  <CardHeader className="p-0">
-                    <Image
-                      src={show.image || "/placeholder.svg?height=400&width=400&query=podcast-cover"}
-                      alt={show.title}
-                      width={400}
-                      height={400}
-                      className="rounded-t-lg object-cover aspect-square"
-                    />
-                  </CardHeader>
-                  <CardContent className="p-4 flex-1">
-                    <CardTitle className="text-lg mb-1">{show.title}</CardTitle>
-                    <CardDescription className="text-sm line-clamp-2">{show.description}</CardDescription>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {getGenreNames(show.genres).map((genre, index) => (
-                        <span key={index} className="text-xs bg-muted px-2 py-1 rounded-full">
-                          {genre}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {currentItems.map((show) => (
+                <Link key={show.id} href={`/show/${show.id}`}>
+                  <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
+                    <CardHeader className="p-0">
+                      <Image
+                        src={show.image || "/placeholder.svg?height=400&width=400&query=podcast-cover"}
+                        alt={show.title}
+                        width={400}
+                        height={400}
+                        className="rounded-t-lg object-cover aspect-square"
+                      />
+                    </CardHeader>
+                    <CardContent className="p-4 flex-1">
+                      <CardTitle className="text-lg mb-1">{show.title}</CardTitle>
+                      <CardDescription className="text-sm line-clamp-2">{show.description}</CardDescription>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {getGenreNames(show.genres).map((genre, index) => (
+                          <span key={index} className="text-xs bg-muted px-2 py-1 rounded-full">
+                            {genre}
+                          </span>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center items-center space-x-2 mt-8">
+              <Button
+                variant="outline"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              >
+                Previous
+              </Button>
+
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNum = index + 1
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === currentPage ? "default" : "outline"}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                )
+              })}
+
+              <Button
+                variant="outline"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              >
+                Next
+              </Button>
+            </div>
+          </>
         )}
       </section>
     </div>
